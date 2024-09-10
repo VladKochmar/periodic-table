@@ -1,0 +1,23 @@
+<h2 mat-dialog-title>Edit Periodic Element</h2>
+<mat-dialog-content class="editor-form">
+  <mat-form-field>
+    <mat-label>Element's Name</mat-label>
+    <input matInput [(ngModel)]="selectedElement.name" />
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Element's Position</mat-label>
+    <input matInput [(ngModel)]="selectedElement.position" />
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Element's Weight</mat-label>
+    <input matInput [(ngModel)]="selectedElement.weight" />
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Element's Symbol</mat-label>
+    <input matInput [(ngModel)]="selectedElement.symbol" />
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button [mat-dialog-close]="selectedElement">Save</button>
+  <button mat-button (click)="onNoClick()">No Thanks</button>
+</mat-dialog-actions>
