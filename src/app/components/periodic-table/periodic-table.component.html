@@ -3,6 +3,7 @@
   <input matInput placeholder="Ex. ium" #input>
 </mat-form-field>
 
+@if (elements) {
 <table mat-table [dataSource]="elements">
   <ng-container matColumnDef="number">
     <th mat-header-cell *matHeaderCellDef> No. </th>
@@ -38,3 +39,4 @@
     <td class="mat-cell" colspan="4">No data matching the filter "{{input.value}}"</td>
   </tr>
 </table>
+}
