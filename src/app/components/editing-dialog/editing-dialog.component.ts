@@ -37,6 +37,7 @@ export class EditingDialogComponent {
   readonly dialogRef = inject(MatDialogRef<EditingDialogComponent>);
   readonly data = inject<DialogData>(MAT_DIALOG_DATA);
   selectedElement = { ...this.data.selectedElement };
+  oldPosition = this.selectedElement.position;
 
   onNoClick() {
     this.dialogRef.close();

@@ -18,6 +18,6 @@
   </mat-form-field>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-button [mat-dialog-close]="selectedElement">Save</button>
+  <button mat-button [mat-dialog-close]="{selectedElement, oldPosition}">Save</button>
   <button mat-button (click)="onNoClick()">No Thanks</button>
 </mat-dialog-actions>

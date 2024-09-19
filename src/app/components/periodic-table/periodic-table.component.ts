@@ -1,21 +1,15 @@
-import {
-  AfterViewInit,
-  Component,
-  inject,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { AfterViewInit, Component, inject, OnInit } from '@angular/core';
+import { MatTableModule } from '@angular/material/table';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { PeriodicElement } from '../../models/periodic-element.model';
-import { ELEMENT_DATA } from '../../../data/mock-data';
 import { MatDialog } from '@angular/material/dialog';
 import { EditingDialogComponent } from '../editing-dialog/editing-dialog.component';
-import { debounceTime, distinctUntilChanged, fromEvent } from 'rxjs';
-import { MatPaginator } from '@angular/material/paginator';
+import { debounceTime, Observable, Subject } from 'rxjs';
+import { AppState } from '../../services/app-state.service';
+import { RxIf } from '@rx-angular/template/if';
 
 @Component({
   selector: 'periodic-table',
@@ -26,29 +20,29 @@ import { MatPaginator } from '@angular/material/paginator';
     MatFormFieldModule,
     MatIconModule,
     MatButtonModule,
+    RxIf,
   ],
   templateUrl: './periodic-table.component.html',
   styleUrl: './periodic-table.component.scss',
 })
-export class PeriodicTableComponent implements OnInit, AfterViewInit {
-  @ViewChild('input') input: any;
+export class PeriodicTableComponent implements OnInit {
+  constructor(private appState: AppState) {}
+
   displayedColumns: string[] = ['number', 'name', 'weight', 'symbol', 'star'];
-  elements: MatTableDataSource<PeriodicElement, MatPaginator> | null = null;
+  filteredElements$: Observable<PeriodicElement[]> | null = null;
+  filterSubject$ = new Subject<string>();
 
   readonly dialog = inject(MatDialog);
 
   ngOnInit(): void {
-    this.elements = new MatTableDataSource(ELEMENT_DATA);
+    this.filteredElements$ = this.appState.state.select('filteredElements');
+    this.appState.loadElements();
+    this.appState.filterElements(this.filterSubject$.pipe(debounceTime(2000)));
   }
 
-  ngAfterViewInit(): void {
-    fromEvent(this.input.nativeElement, 'keyup')
-      .pipe(debounceTime(2000), distinctUntilChanged())
-      .subscribe(() => {
-        const filterValue = this.input.nativeElement.value;
-        if (this.elements)
-          this.elements.filter = filterValue.trim().toLowerCase();
-      });
+  onFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.filterSubject$.next(filterValue);
   }
 
   openDialog(periodicElement: PeriodicElement): void {
@@ -57,16 +51,8 @@ export class PeriodicTableComponent implements OnInit, AfterViewInit {
     });
 
     dialogRef.afterClosed().subscribe((result) => {
-      if (this.elements && result !== undefined) {
-        const index = this.elements.data.findIndex(
-          (element) => element.name === periodicElement.name
-        );
-
-        this.elements.data = [
-          ...this.elements.data.slice(0, index),
-          result,
-          ...this.elements.data.slice(index + 1),
-        ];
+      if (result.selectedElement) {
+        this.appState.updateElement(result.selectedElement, result.oldPosition);
       }
     });
   }
