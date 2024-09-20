@@ -22,10 +22,10 @@ export class AppState {
     this.state.connect(of({ filteredElements: ELEMENT_DATA }));
   }
 
-  filterElements(filet$: Observable<string>) {
+  filterElements(filtet$: Observable<string>) {
     this.state.connect(
       'filteredElements',
-      filet$.pipe(
+      filtet$.pipe(
         map((filterValue) => {
           return this.state.get('elements').filter((element) => {
             return (
